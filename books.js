@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
-const url = 'http://books.toscrape.com/catalogue/page-1.html';
+const url = 'http://books.toscrape.com/';
 const file = path.join(__dirname, 'data/books.json');
 
 (async () => {
@@ -10,11 +10,20 @@ const file = path.join(__dirname, 'data/books.json');
   const page = await browser.newPage();
   await page.goto(url);
 
-  let json = [];
+  const json = [];
   let next = await page.$('.pager .next a');
   while (next) {
-    const data = await page.evaluate(getData);
-    json = json.concat(data);
+    let articles = await page.$$('.product_pod a');
+    for (let index = 0; index < articles.length; index++) {
+      await Promise.all([
+        page.waitForNavigation(),
+        articles[index].click(),
+      ]);
+      const data = await page.evaluate(getData);
+      json.push(data);
+      await page.goBack();
+      articles = await page.$$('.product_pod a');
+    }
     await Promise.all([
       page.waitForNavigation(),
       page.click('.pager .next a'),
@@ -26,18 +35,24 @@ const file = path.join(__dirname, 'data/books.json');
 })();
 
 /**
- * @return {array}
+ * @return {object}
  */
 function getData() {
-  const products = Array.from(document.querySelectorAll('.product_pod'));
-  const data = products.map((product) => {
-    return {
-      title: product.querySelector('h3 a').getAttribute('title'),
-      price: product.querySelector('.product_price .price_color').textContent,
-      cover:
-        location.origin +
-        product.querySelector('img').getAttribute('src').slice(2),
-    };
-  });
-  return data;
+  const product = document.querySelector('.product_page');
+  return {
+    title: product.querySelector('h1').textContent,
+    price: product.querySelector('.price_color').textContent,
+    description:
+      document.querySelector('#product_description ~ p')
+        ? document.querySelector('#product_description ~ p').textContent
+        : '',
+    category:
+      document.querySelector('.breadcrumb li:nth-child(3) a')
+        ? document.querySelector('.breadcrumb li:nth-child(3) a').textContent
+        : '',
+    cover:
+      location.origin +
+      document.querySelector('#product_gallery img')
+          .getAttribute('src').slice(5),
+  };
 }
