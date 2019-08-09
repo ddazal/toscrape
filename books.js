@@ -13,7 +13,7 @@ const file = path.join(__dirname, 'data/books.json');
   const json = [];
   let next = await page.$('.pager .next a');
   while (next) {
-    let articles = await page.$$('.product_pod a');
+    let articles = await page.$$('.product_pod h3 a');
     for (let index = 0; index < articles.length; index++) {
       await Promise.all([
         page.waitForNavigation(),
@@ -22,7 +22,7 @@ const file = path.join(__dirname, 'data/books.json');
       const data = await page.evaluate(getData);
       json.push(data);
       await page.goBack();
-      articles = await page.$$('.product_pod a');
+      articles = await page.$$('.product_pod h3 a');
     }
     await Promise.all([
       page.waitForNavigation(),
