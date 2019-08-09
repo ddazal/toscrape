@@ -1,0 +1,14 @@
+{
+  "name": "toscrape",
+  "version": "1.0.0",
+  "description": "Scraping with puppeteer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Daza <03dazal@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^1.19.0"
+  }
+}
