@@ -10,5 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "puppeteer": "^1.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0"
   }
 }
