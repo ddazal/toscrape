@@ -13,6 +13,7 @@ const file = path.join(__dirname, 'data/books.json');
   const json = [];
   let next = await page.$('.pager .next a');
   while (next) {
+    next = await page.$('.pager .next a');
     let articles = await page.$$('.product_pod h3 a');
     for (let index = 0; index < articles.length; index++) {
       await Promise.all([
@@ -24,11 +25,12 @@ const file = path.join(__dirname, 'data/books.json');
       await page.goBack();
       articles = await page.$$('.product_pod h3 a');
     }
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('.pager .next a'),
-    ]);
-    next = await page.$('.pager .next a');
+    if (next) {
+      await Promise.all([
+        page.waitForNavigation(),
+        page.click('.pager .next a'),
+      ]);
+    }
   }
   fs.writeFileSync(file, JSON.stringify(json), 'utf8');
   await browser.close();

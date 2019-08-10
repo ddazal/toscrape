@@ -14,13 +14,15 @@ const file = path.join(__dirname, 'data/quotes.json');
   let next = await page.$('.pager .next a');
 
   while (next) {
+    next = await page.$('.pager .next a');
     const quotes = await page.$$eval('.quote', getData);
     json = json.concat(quotes);
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('.pager .next a'),
-    ]);
-    next = await page.$('.pager .next a');
+    if (next) {
+      await Promise.all([
+        page.waitForNavigation(),
+        page.click('.pager .next a'),
+      ]);
+    }
   }
 
   fs.writeFileSync(file, JSON.stringify(json), 'utf8');
